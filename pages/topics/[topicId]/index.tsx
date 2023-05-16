@@ -18,7 +18,8 @@ import {ref, uploadBytesResumable,getDownloadURL,listAll} from "firebase/storage
 import {db} from "../../../firebase"
 import { Avatar } from "@mui/material";
 import Link from "next/link";
-import { preProcessFile } from "typescript";
+import EditIcon from '@mui/icons-material/Edit';
+import { EditSub } from "@/components/EditSub";
 
 type Props={
   topic:Topic
@@ -38,12 +39,15 @@ export default function SelectTopic({topic}:Props){
     comments:[],
     date:"",
     imageUrl:"",
+    imageName:"",
     user:{name:"",photoURL:""}})
   const [subtopicList,setSubtopicList]=useState<Subtopic[]>([])
   const {state}=useContext(UserContext)
   const [userImgs,setUserImgs]=useState<File>({} as File)
-  const [url,setUrl]=useState<string>("")
-  const imageName=userImgs.name+uuidv4()
+  const [url,setUrl]=useState(null || "")
+  const [editTopic,setEditTopic]=useState<Subtopic>({} as Subtopic)
+  const [edit,setEdit]=useState(false)
+
 
   useEffect(()=>{
     if(topic.topicId !==""){
@@ -57,17 +61,38 @@ export default function SelectTopic({topic}:Props){
     }
   },[])
   useEffect(()=>{
-    if(topic.topicId !==""){
-      const subtopicRef=doc(db,"topics",`${topic.topicId}`)
-      const unSubscribe=onSnapshot(subtopicRef,(doc:any)=>{
-        const dbList=doc.data()
-        const list=dbList!.subtopics
-        setSubtopicList(list)
-      })
-      return ()=>unSubscribe()
+    const uploadFile=()=>{
+      const storageRef=ref(storage,`${state.user.id}/posts/${uuidv4()}`)
+          const uploadTask=uploadBytesResumable(storageRef, userImgs)
+          uploadTask.on('state_changed', 
+        (snapshot:any) => {
+          const progress =
+                  (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          console.log('Upload is ' + progress + '% done');
+          switch (snapshot.state) {
+            case 'paused':
+              console.log('Upload is paused');
+              break;
+            case 'running':
+              console.log('Upload is running');
+              break;
+            default:
+              break;
+          }
+        }, 
+        (error:any) => {
+          console.log(error)
+        }, 
+        () => {
+              userImgs.name ? getDownloadURL(storageRef)
+                .then((url) => {
+                  setUrl(url);
+                }) : setUrl("")})
+        }
+        uploadFile()
     }
-  },[])
-
+  ,[userImgs])
+console.log(userImgs)
   useEffect(()=>{
     if(topic.topicId !==""){
       const subtopicRef=doc(db,"topics",`${topic.topicId}`)
@@ -90,6 +115,9 @@ export default function SelectTopic({topic}:Props){
   const handleChangeSub=(e:any)=>{
     const {name,value}=e.target
     setSubtopic((pre)=>{
+      return {...pre,[name]:value}
+    })
+    setEditTopic((pre)=>{
       return {...pre,[name]:value}
     })
   }
@@ -124,17 +152,12 @@ export default function SelectTopic({topic}:Props){
   }
   const changeImg=(e:React.ChangeEvent<HTMLInputElement>)=>{
     setUserImgs(e.target.files![0]) 
-    const storageRef=ref(storage,`${state.user.id}/posts/${uuidv4()}`)
-    uploadBytesResumable(storageRef,userImgs).then((snapshot)=>{
-      getDownloadURL(snapshot.ref).then((url)=>{
-        setUrl(url)
-        console.log(url)
-      })
-    })
+    
   }
   const handleAddSub=async(e:any)=>{
     e.preventDefault()
-    const newSubject={id:uuidv4(),title:subtopic.title,message:subtopic.message,comments:[],imageUrl:url,date:now.format("HH:mm in MM/DD/YYYY"),user:{name:state.user.name,photoURL:state.user.photoURL}}
+    const newSubject={id:uuidv4(),title:subtopic.title,message:subtopic.message,comments:[],
+      imageUrl:url,imageName:userImgs.name,date:now.format("HH:mm in MM/DD/YYYY"),user:{name:state.user.name,photoURL:state.user.photoURL}}
     setSubtopicList((pre)=>{
       return [...pre,newSubject]
     })
@@ -144,12 +167,12 @@ export default function SelectTopic({topic}:Props){
       message:"",
       comments:[],
       imageUrl:"",
+      imageName:"",
       date:"",user:{name:"",photoURL:""}
     })
     const subtopicRef=doc(db,"topics",`${topic.topicId}`)
     const listRef=await getDoc(subtopicRef)
     const dbList=listRef.data()
-    console.log(newSubject)
     const newSubList=[...dbList!.subtopics,newSubject]
     setDoc(subtopicRef,{...dbList,subtopics:newSubList})
   }
@@ -196,7 +219,40 @@ const handleDislike=async(id:string)=>{
     newList.subtopics=newSubtopicList
     setDoc(subtopicRef,newList)
 }
-
+const handleEdit=(sub:Subtopic)=>{
+  setEdit(true)
+  setFormSub(false)
+  setEditTopic(sub)
+}
+const onEdit=async(e:any)=>{
+  e.preventDefault()
+    const editSubject={...editTopic,title:editTopic.title,message:editTopic.message,
+    date:now.format("HH:mm in MM/DD/YYYY"),imageUrl:editTopic.imageUrl,
+      }
+      console.log(editSubject)
+  subtopicList[subtopicList.findIndex((item)=>item.id===editSubject.id)]=editSubject 
+  setSubtopicList((pre)=>[...pre])
+  setEditTopic({
+    id:"",
+    title:"",
+    message:"",
+    comments:[],
+    imageUrl:"",
+    imageName:"",
+    date:"",user:{name:"",photoURL:""}
+  }) 
+  setEdit(false)
+  const subtopicRef=doc(db,"topics",`${topic.topicId}`)
+    const listRef=await getDoc(subtopicRef)
+    const dbList=listRef.data()
+    const newList={...dbList!}
+    const oldSubtopicIndex=newList.subtopics.findIndex((item:any)=>item.id===editTopic.id)
+    const newSubtopic={...editSubject}
+    let newSubtopicList=[...newList.subtopics]
+    newSubtopicList[oldSubtopicIndex]=newSubtopic
+    newList.subtopics=newSubtopicList
+    setDoc(subtopicRef,newList)
+}
   return (
     <>
     <Container>
@@ -209,7 +265,7 @@ const handleDislike=async(id:string)=>{
     <p>{subtopic.user.name}</p>
     <p className={styles.articledate}>{subtopic.date}</p>
     </div>
-    <p>{subtopic.message}</p>
+    <p style={{whiteSpace:"pre-wrap"}}>{subtopic.message}</p>
     <Button className={styles.commentbtn} onClick={()=>setFormComment(true)}>Write a comment</Button>
     <Row className="mt-5">{formComment && <NewMessage handleAdd={handleAdd} handleChange={handleChange} message={message}/>}</Row>
   {comments.map((comment)=>{
@@ -246,6 +302,7 @@ const handleDislike=async(id:string)=>{
     <p>{topic.body}</p>
     <Link href={state.user.name ==="" ? "/signin" : `/topics/${topic.topicId}`}><Button className={styles.articlebtn} onClick={()=>setFormSub(true)}>Create a new subject</Button></Link>
     {formSub && <NewSubject handleAdd={handleAddSub} onChangeImg={changeImg} handleChange={handleChangeSub} subtopic={subtopic}/>}
+    {edit && <EditSub  subtopic={editTopic} onChangeImg={changeImg} onEdit={onEdit} handleChange={handleChangeSub}/>}
     </Row>
   {subtopicList.map((sub)=>{
     return  <Card className={styles.commentCard} key={sub.id}>
@@ -253,6 +310,7 @@ const handleDislike=async(id:string)=>{
       <Card.Title>{sub.title}</Card.Title>
       <Card.Text className={styles.commenttext}>Created at {sub.date}</Card.Text>
       <Card.Link className={styles.cardlink} href={state.user.name ==="" ? "/signin" : undefined} onClick={()=>handleSelect(sub.id)}>Details</Card.Link>
+    {sub.user.name=== state.user.name && <EditIcon className="mx-4" onClick={()=>handleEdit(sub)}/>}
     </Card.Body>
   </Card>
   })}</>}

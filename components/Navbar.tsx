@@ -5,6 +5,8 @@ import Person2Icon from '@mui/icons-material/Person2';
 import Link from "next/link";
 import { useRouter } from "next/router";
 import styles from '@/styles/Home.module.sass'
+import blog from "../blogging.png"
+import Image from "next/image";
 
 export const NavbarModal=()=>{
   const {state,dispatch}=useContext(UserContext)
@@ -20,7 +22,7 @@ export const NavbarModal=()=>{
   return <>
   <Navbar className={styles.navbarmodal} expand="lg">
     <Container>
-      <Navbar.Brand href="/">BlogApp</Navbar.Brand>
+      <Navbar.Brand href="/"><Image src={blog} alt="" style={{width:"40px", height:"40px",marginRight:"10px"}}/>G'log</Navbar.Brand>
       <Nav>
         <Nav.Link href="/topics">Topics</Nav.Link>
         {state.user.email ==="" ? <Nav.Link href="/signin">Sign in</Nav.Link> : 

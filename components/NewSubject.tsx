@@ -1,11 +1,7 @@
 import { Subtopic } from "@/types"
 import { Form,Button } from "react-bootstrap"
 import styles from "../styles/topicId.module.sass"
-import { useContext, useState } from "react"
-import { auth,storage} from "../firebase";
-import {ref, uploadBytesResumable,getDownloadURL,listAll} from "firebase/storage"
-import { UserContext } from "./UserContext";
-import { v4 as uuidv4 } from 'uuid';
+
 
 type Props={
   subtopic:Subtopic,
@@ -14,16 +10,10 @@ type Props={
   onChangeImg:(e:any)=>void
 }
 export const NewSubject=({subtopic,handleAdd,handleChange,onChangeImg}:Props)=>{
-  
-  const {state}=useContext(UserContext)
-
-  const fileListRef=ref(storage,`${state.user.id}/posts/`)
- 
 
   const handleSubmit=(e:any)=>{
     e.preventDefault()
     handleAdd(e)
-    
   }
 
   return(<Form className={styles.commentForm} onSubmit={handleSubmit}>

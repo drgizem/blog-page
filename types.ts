@@ -11,6 +11,7 @@ export type Subtopic={
   comments:Message[],
   date:string,
   imageUrl:string,
+  imageName:string,
   user:{name:string,photoURL:string}
 }
 export type Message={
