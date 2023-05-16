@@ -1,0 +1,50 @@
+@import "./colors"
+@import "./mixins"
+.article
+  margin-bottom: 5%
+  margin-top: 3%
+  .articleimage
+    max-width: 500px
+    height: 350px
+  .articlebtn
+    background-color: $button-color
+    border: none
+    margin-bottom: 2%
+  .articleuser
+    display: flex
+    align-items: end
+    gap: 5px
+    margin-bottom: 1%
+    .articledate
+      font-size: 13px
+      margin-left: 3%
+  .commentbtn
+    max-width: 150px
+    background-color: $button-color
+    border: none
+    margin-top: 1%
+.commentForm
+  max-width: 600px
+  margin-bottom: 5%
+.commentCard
+  max-width: 600px
+  @include cardbg
+  margin-bottom: 2%
+  padding: 10px 10px 
+  .commenttext
+    font-size: 14px
+  .cardlink
+    @include cardlink
+  .commentTitle
+    display: flex
+    flex-direction: row
+    justify-content: space-between
+    .commentTime
+      font-size: 14px
+  .likediv
+    display: flex
+    flex-direction: row
+    gap: 5px
+    .likebtn
+      display: flex
+      flex-direction: row

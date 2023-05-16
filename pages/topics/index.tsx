@@ -2,6 +2,9 @@ import { NavbarModal } from "@/components/Navbar"
 import { TopicCard } from "@/components/TopicCard"
 import { Topic } from "@/types"
 import { useState,useEffect } from "react"
+import styles from "../../styles/topics.module.sass"
+import { Container, Row } from "react-bootstrap"
+
 
 
 export default function Topics(){
@@ -16,13 +19,16 @@ export default function Topics(){
     fetchTopic()
   },[])
   return (<>
+  <Container>
   <NavbarModal/>
-    {topics.map((topic)=>{
+  <Row>
+  {topics.map((topic)=>{
       return (
-      <div key={topic.topicId}>
-        <TopicCard topic={topic}/>
-      </div>   
+        <TopicCard key={topic.topicId} topic={topic}/>
       )
     })}
+  </Row>
+  </Container>
+  
   </>)
 }

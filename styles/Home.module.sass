@@ -1,2 +1,45 @@
+@import "./colors"
+@import "./mixins"
+
 .title
   color: red
+.subnav
+  display: flex
+  flex-direction: row
+  gap: 25px
+  margin-top: 2%
+  margin-left: 3%
+  cursor: pointer
+  a
+    color: black
+    text-decoration: none
+    &:hover
+      color: blue
+.intro
+  @include cardbg
+  height:300px
+  .bookimg
+    width: 200px
+    height: 150px
+.navbarmodal
+  @include navbg
+  .navbartoggle
+    @include navbg
+    border: none
+    color: $button-color
+  .navbarlink
+    @include cardlink
+.latestcard
+  box-shadow: 2px 2px 2px 2px rgba(0, 0, 0, 0.2)
+  .latestbtn
+    background-color: $button-color
+    border: none
+    &:hover
+      background-color: $button-color
+.footer
+  @include cardbg
+  max-height:190px
+  padding: 20px 20px
+.footerfooter
+  display: flex
+  flex-direction: row

@@ -1,24 +1,262 @@
 import { topics } from "@/data-topics/topics"
-import { Topic } from "@/types"
-import { Card } from "react-bootstrap"
+import { Message, Topic,Subtopic,User } from "@/types"
+import { useContext, useState,useEffect } from "react"
+import { Button, Card,Form,Col, Row, Container } from "react-bootstrap"
+import ThumbUpAltIcon from '@mui/icons-material/ThumbUpAlt';
+import ThumbDownAltIcon from '@mui/icons-material/ThumbDownAlt';
+import { v4 as uuidv4 } from 'uuid';
+import styles from "../../../styles/topicId.module.sass"
+import  dayjs,{Dayjs} from 'dayjs'
+import { NavbarModal } from "@/components/Navbar";
+import { useRouter } from "next/router";
+import { NewMessage } from "@/components/NewMessage";
+import { UserContext } from "@/components/UserContext";
+import { NewSubject } from "@/components/NewSubject";
+import { setDoc,getDoc,doc, onSnapshot } from "firebase/firestore";
+import { auth,storage} from "../../../firebase";
+import {ref, uploadBytesResumable,getDownloadURL,listAll} from "firebase/storage"
+import {db} from "../../../firebase"
+import { Avatar } from "@mui/material";
+import Link from "next/link";
+import { preProcessFile } from "typescript";
 
 type Props={
   topic:Topic
 }
+let now:Dayjs=dayjs()
 
 export default function SelectTopic({topic}:Props){
+  const [comments,setComments]=useState<Message[]>([])
+  const [formComment,setFormComment]=useState(false)
+  const [formSub,setFormSub]=useState(false)
+  const [message,setMessage]=useState<Message>({} as Message)
+  const router=useRouter()
+  const [subtopic,setSubtopic]=useState<Subtopic>({
+    id:"",
+    title:"",
+    message:"",
+    comments:[],
+    date:"",
+    imageUrl:"",
+    user:{name:"",photoURL:""}})
+  const [subtopicList,setSubtopicList]=useState<Subtopic[]>([])
+  const {state}=useContext(UserContext)
+  const [userImgs,setUserImgs]=useState<File>({} as File)
+  const [url,setUrl]=useState<string>("")
+  const imageName=userImgs.name+uuidv4()
+
+  useEffect(()=>{
+    if(topic.topicId !==""){
+      const subtopicRef=doc(db,"topics",`${topic.topicId}`)
+      const unSubscribe=onSnapshot(subtopicRef,(doc:any)=>{
+        const dbList=doc.data()
+        const list=dbList!.subtopics
+        setSubtopicList(list)
+      })
+      return ()=>unSubscribe()
+    }
+  },[])
+  useEffect(()=>{
+    if(topic.topicId !==""){
+      const subtopicRef=doc(db,"topics",`${topic.topicId}`)
+      const unSubscribe=onSnapshot(subtopicRef,(doc:any)=>{
+        const dbList=doc.data()
+        const list=dbList!.subtopics
+        setSubtopicList(list)
+      })
+      return ()=>unSubscribe()
+    }
+  },[])
+
+  useEffect(()=>{
+    if(topic.topicId !==""){
+      const subtopicRef=doc(db,"topics",`${topic.topicId}`)
+      const unSubscribe=onSnapshot(subtopicRef,(doc)=>{
+        const dbList=doc.data()
+        const list=dbList!.subtopics
+        const sub=list.find((item:any)=>item.id===subtopic.id)
+        sub && setComments(sub.comments)
+      })
+      return ()=>unSubscribe()
+    }
+  },[subtopic])
+
+  const handleChange=(e:any)=>{
+    const {name,value}=e.target
+    setMessage((pre)=>{
+      return {...pre,[name]:value}
+    })
+  }
+  const handleChangeSub=(e:any)=>{
+    const {name,value}=e.target
+    setSubtopic((pre)=>{
+      return {...pre,[name]:value}
+    })
+  }
+
+  const handleAdd=async(e:any)=>{
+    setFormComment(false)
+    e.preventDefault()
+    const newMessage={title:message.title,comment:message.comment,id:uuidv4(),date:now.format('HH:mm MM/DD'),user:{name:state.user.name,photoURL:state.user.photoURL},like:0,dislike:0}
+    setComments((pre)=>{
+      return [...pre,newMessage]
+    })
+    setMessage({
+      id:"",
+      title:"",
+      comment:"",
+      date:"",
+      user:{name:"",photoURL:""},
+      dislike:0,
+      like:0
+    })
+    const subtopicRef=doc(db,"topics",`${topic.topicId}`)
+    const listRef=await getDoc(subtopicRef)
+    const dbList=listRef.data()
+    const newList={...dbList!}
+    const oldSubtopicIndex=newList.subtopics.findIndex((item:any)=>item.id===subtopic.id)
+    const oldSubtopic=newList.subtopics[oldSubtopicIndex]
+    const newSubtopic={...oldSubtopic,comments:[...oldSubtopic.comments,newMessage]}
+    let newSubtopicList=[...newList.subtopics]
+    newSubtopicList[oldSubtopicIndex]=newSubtopic
+    newList.subtopics=newSubtopicList
+    setDoc(subtopicRef,newList)
+  }
+  const changeImg=(e:React.ChangeEvent<HTMLInputElement>)=>{
+    setUserImgs(e.target.files![0]) 
+    const storageRef=ref(storage,`${state.user.id}/posts/${uuidv4()}`)
+    uploadBytesResumable(storageRef,userImgs).then((snapshot)=>{
+      getDownloadURL(snapshot.ref).then((url)=>{
+        setUrl(url)
+        console.log(url)
+      })
+    })
+  }
+  const handleAddSub=async(e:any)=>{
+    e.preventDefault()
+    const newSubject={id:uuidv4(),title:subtopic.title,message:subtopic.message,comments:[],imageUrl:url,date:now.format("HH:mm in MM/DD/YYYY"),user:{name:state.user.name,photoURL:state.user.photoURL}}
+    setSubtopicList((pre)=>{
+      return [...pre,newSubject]
+    })
+    setSubtopic({
+      id:"",
+      title:"",
+      message:"",
+      comments:[],
+      imageUrl:"",
+      date:"",user:{name:"",photoURL:""}
+    })
+    const subtopicRef=doc(db,"topics",`${topic.topicId}`)
+    const listRef=await getDoc(subtopicRef)
+    const dbList=listRef.data()
+    console.log(newSubject)
+    const newSubList=[...dbList!.subtopics,newSubject]
+    setDoc(subtopicRef,{...dbList,subtopics:newSubList})
+  }
+ const handleSelect=(id:string)=>{
+  router.push(`/topics/${topic.topicId}?subtopic=${id}}`,undefined,{shallow:true})
+  const newsub=subtopicList.find((item)=>item.id===id)
+  setSubtopic(newsub!)
+ }
+const handleLike=async(id:string)=>{
+  const subtopicRef=doc(db,"topics",`${topic.topicId}`)
+    const listRef=await getDoc(subtopicRef)
+    const dbList=listRef.data()
+    const newList={...dbList!}
+    const oldSubtopicIndex=newList.subtopics.findIndex((item:any)=>item.id===subtopic.id)
+    const oldSubtopic=newList.subtopics[oldSubtopicIndex]
+    const newSubtopic={...oldSubtopic}
+    const oldCommentIndex=newSubtopic.comments.findIndex((item:any)=>item.id===id)
+    const oldComment=newSubtopic.comments[oldCommentIndex]
+    const newComment={...oldComment,like:oldComment.like+1}
+    let newCommentList=[...newSubtopic.comments]
+    newCommentList[oldCommentIndex]=newComment
+    newSubtopic.comments=newCommentList
+    let newSubtopicList=[...newList.subtopics]
+    newSubtopicList[oldSubtopicIndex]=newSubtopic
+    newList.subtopics=newSubtopicList
+    setDoc(subtopicRef,newList)
+}
+const handleDislike=async(id:string)=>{
+  const subtopicRef=doc(db,"topics",`${topic.topicId}`)
+    const listRef=await getDoc(subtopicRef)
+    const dbList=listRef.data()
+    const newList={...dbList!}
+    const oldSubtopicIndex=newList.subtopics.findIndex((item:any)=>item.id===subtopic.id)
+    const oldSubtopic=newList.subtopics[oldSubtopicIndex]
+    const newSubtopic={...oldSubtopic}
+    const oldCommentIndex=newSubtopic.comments.findIndex((item:any)=>item.id===id)
+    const oldComment=newSubtopic.comments[oldCommentIndex]
+    const newComment={...oldComment,dislike:oldComment.dislike+1}
+    let newCommentList=[...newSubtopic.comments]
+    newCommentList[oldCommentIndex]=newComment
+    newSubtopic.comments=newCommentList
+    let newSubtopicList=[...newList.subtopics]
+    newSubtopicList[oldSubtopicIndex]=newSubtopic
+    newList.subtopics=newSubtopicList
+    setDoc(subtopicRef,newList)
+}
+
   return (
     <>
+    <Container>
+    <NavbarModal />
+    {subtopic.id !=="" ? <Row className={styles.article}>
+    <h1>{subtopic.title}</h1>
+    {subtopic.imageUrl !=="" && <img src={subtopic.imageUrl} alt="" className={styles.articleimage}/>}
+    <div className={styles.articleuser}>
+    <Avatar className="mt-3" src={subtopic.user.photoURL}/>
+    <p>{subtopic.user.name}</p>
+    <p className={styles.articledate}>{subtopic.date}</p>
+    </div>
+    <p>{subtopic.message}</p>
+    <Button className={styles.commentbtn} onClick={()=>setFormComment(true)}>Write a comment</Button>
+    <Row className="mt-5">{formComment && <NewMessage handleAdd={handleAdd} handleChange={handleChange} message={message}/>}</Row>
+  {comments.map((comment)=>{
+      return <Card key={comment.id} className={styles.commentCard}>
+        <Row>
+        <Col xs={2}>
+         <Avatar className="mt-3" src={comment.user.photoURL}/>
+         <div className="mt-3">{comment.user.name}</div>
+        </Col>
+        <Col>
+        <div className={styles.commentTitle}>
+        <Card.Title>{comment.title}</Card.Title>
+        <p className={styles.commentTime}>{comment.date}</p></div>
+        <Card.Text>
+          {comment.comment}
+        </Card.Text>
+        <Row className={styles.likediv}>
+        <Col className={styles.likebtn}>
+        <ThumbUpAltIcon onClick={()=>handleLike(comment.id)}/>
+        <p>{comment.like}</p>
+        </Col>
+        < Col className={styles.likebtn}>
+        <ThumbDownAltIcon onClick={()=>handleDislike(comment.id)}/>
+        <p>{comment.dislike}</p>
+        </Col>
+        </Row>
+        </Col>
+        </Row>
+      </Card>
+    })}
+    </Row> : <>
+    <Row className={styles.article}>
     <h1>{topic.title}</h1>
     <p>{topic.body}</p>
-    {topic.subtopics.map((sub)=>{
-      return (<Card >
-      <Card.Body>
-        <Card.Title>{sub.title}</Card.Title>
-        <Card.Link href={`/topics/${topic.topicId}/${sub.id}`}>See messagges and details</Card.Link>
-      </Card.Body>
-    </Card>)
-    })}
+    <Link href={state.user.name ==="" ? "/signin" : `/topics/${topic.topicId}`}><Button className={styles.articlebtn} onClick={()=>setFormSub(true)}>Create a new subject</Button></Link>
+    {formSub && <NewSubject handleAdd={handleAddSub} onChangeImg={changeImg} handleChange={handleChangeSub} subtopic={subtopic}/>}
+    </Row>
+  {subtopicList.map((sub)=>{
+    return  <Card className={styles.commentCard} key={sub.id}>
+    <Card.Body>
+      <Card.Title>{sub.title}</Card.Title>
+      <Card.Text className={styles.commenttext}>Created at {sub.date}</Card.Text>
+      <Card.Link className={styles.cardlink} href={state.user.name ==="" ? "/signin" : undefined} onClick={()=>handleSelect(sub.id)}>Details</Card.Link>
+    </Card.Body>
+  </Card>
+  })}</>}
+    </Container>
     </>
   )
 }
