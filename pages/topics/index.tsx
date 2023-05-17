@@ -2,7 +2,6 @@ import { NavbarModal } from "@/components/Navbar"
 import { TopicCard } from "@/components/TopicCard"
 import { Topic } from "@/types"
 import { useState,useEffect } from "react"
-import styles from "../../styles/topics.module.sass"
 import { Container, Row } from "react-bootstrap"
 
 

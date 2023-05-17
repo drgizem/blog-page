@@ -10,7 +10,7 @@ export const Intro=()=>{
     <Container className={styles.intro}>
       <Row className="pt-5 px-4">
         <Col>
-        <h1>Hello,<br></br>Welcome to my blog</h1>
+        <h1>Hello,<br></br>Welcome to G'log</h1>
         <p>Don't miss out on the latest news about Fashion, Travel, Food guide...</p>
         </Col>
         <Col>

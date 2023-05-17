@@ -6,10 +6,14 @@
   padding: 50px 50px
   .signincheck
     input
+      box-shadow: none
+      &:focus
+        border-color: $button-color
       &:checked
         background-color: $button-color
         border: none
         transition: visibility 0s
+        accent-color: $button-color
   .signinForm
     max-width: 400px
     .signinbtn

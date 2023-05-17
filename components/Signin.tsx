@@ -1,5 +1,4 @@
 import { Form,Button } from "react-bootstrap"
-import { User } from "@/types"
 import { useContext, useState } from "react"
 import styles from "../styles/signin.module.sass"
 import { UserContext } from "./UserContext"
@@ -23,6 +22,7 @@ export const Signin=()=>{
   }
   const handleSignin=(e:any)=>{
     e.preventDefault()
+    setValidated(true)
     signInWithEmailAndPassword(auth,user.email,user.password)
     .then((userCredential)=>{
       const user=userCredential.user

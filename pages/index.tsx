@@ -1,4 +1,4 @@
-import styles from '@/styles/Home.module.sass'
+
 import { NavbarModal } from "@/components/Navbar"
 import { Container } from 'react-bootstrap'
 import { SubNav } from '@/components/SubNav'

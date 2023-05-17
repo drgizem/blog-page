@@ -23,12 +23,12 @@ export const NavbarModal=()=>{
   <Navbar className={styles.navbarmodal} expand="lg">
     <Container>
       <Navbar.Brand href="/"><Image src={blog} alt="" style={{width:"40px", height:"40px",marginRight:"10px"}}/>G'log</Navbar.Brand>
-      <Nav>
-        <Nav.Link href="/topics">Topics</Nav.Link>
+      <Nav className={styles.navbarmodalnav} >
+        <Nav.Link href="/topics" className={styles.navsubtitle}>Topics</Nav.Link>
         {state.user.email ==="" ? <Nav.Link href="/signin">Sign in</Nav.Link> : 
-        <Dropdown>
+        <Dropdown className={styles.navdropdown}>
           <Dropdown.Toggle className={styles.navbartoggle}><Person2Icon/></Dropdown.Toggle>
-          <Dropdown.Menu>
+          <Dropdown.Menu className={styles.navdropdownmenu}>
             <Dropdown.Item ><Link href="/profile" className={styles.navbarlink}>Profile</Link></Dropdown.Item>
             <Dropdown.Item onClick={handleLogout}>Logout</Dropdown.Item>
           </Dropdown.Menu>

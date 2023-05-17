@@ -25,13 +25,13 @@ export const Latest=()=>{
           </Col>
           <Col>
           <Card style={{ width: '15rem' }} className={styles.latestcard}>
-      <Card.Img variant="top" src="https://firebasestorage.googleapis.com/v0/b/blog-9afc2.appspot.com/o/8gk9n36jSFRAQugteXAYPLpcBfJ3%2Fposts%2F726ff51a-48de-4cc9-856f-116ef5235184?alt=media&token=1bbaaed3-9f61-4046-8e49-88eafea4d4e1" />
+      <Card.Img variant="top" src="https://firebasestorage.googleapis.com/v0/b/blog-9afc2.appspot.com/o/8gk9n36jSFRAQugteXAYPLpcBfJ3%2Fposts%2F7566257c-1b33-40f7-825b-d372750d2062?alt=media&token=6c22f1b3-5138-4a48-ba45-7592ae97492d" />
       <Card.Body className={styles.latestcardbody}>
         <Card.Title>The Vibrant Choice: Exploring the Significance of Orange in the New York Knicks' Color Palette</Card.Title>
         <Card.Text>
         The New York Knicks, one of the most iconic teams in the National Basketball Association (NBA), proudly don the colors of orange and blue.
         </Card.Text>
-        <Link href="/topics/5?subtopic=2e0869eb-cf8f-4c96-afab-058f03779ac0}"><Button className={styles.latestbtn} variant="primary">Go this post</Button></Link>
+        <Link href="/topics/5?subtopic=e49f0df4-b543-40e1-9983-b895cbcfb9fc}"><Button className={styles.latestbtn} variant="primary">Go this post</Button></Link>
       </Card.Body>
     </Card>
           </Col>

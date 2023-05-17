@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button, Container, Form } from "react-bootstrap";
+import { Container, Form } from "react-bootstrap";
 import { Signup } from "@/components/Signup";
 import { Signin } from "@/components/Signin";
 import { NavbarModal } from "@/components/Navbar";
@@ -18,7 +18,6 @@ export default function SigninPage(){
   {signin ? <Signup /> : <Signin />}
   </div>
   </Container>
-  
   </>
   )
 }

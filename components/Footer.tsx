@@ -17,6 +17,7 @@ export const Footer=()=>{
         </Col>
         <Col>
         <h4>Contact</h4><hr/>
+        <p>drgizemakpinar@gmail.com</p>
         <p>Wilmington, NC 28412</p>
         </Col>
         <Col>

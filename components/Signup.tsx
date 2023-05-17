@@ -1,5 +1,4 @@
 import { Form,Button } from "react-bootstrap"
-import { User } from "@/types"
 import { useContext, useState } from "react"
 import styles from "../styles/signin.module.sass"
 import {auth} from "../firebase"
@@ -7,7 +6,7 @@ import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth"
 import { UserContext } from "./UserContext"
 import { useRouter } from "next/router"
 import { setDoc,getDoc,doc, updateDoc } from "firebase/firestore";
-import {db} from "../firebase"
+
 
 export const Signup=()=>{
   const [user,setUser]=useState({email:"",password:"",name:""})
@@ -25,6 +24,7 @@ export const Signup=()=>{
   }
   const handleSignup=(e:any)=>{
     e.preventDefault()
+    setValidated(true)
     createUserWithEmailAndPassword(auth,user.email,user.password)
     .then(()=>{
       updateProfile(auth.currentUser!,{
@@ -41,12 +41,6 @@ export const Signup=()=>{
           }
       })
    })
-   .then(()=>{
-    setDoc(doc(db,"users",`${auth.currentUser!.uid}`),{
-      photoURL:auth.currentUser?.photoURL,
-      username:auth.currentUser?.displayName
-    })
-  })
    .then(()=>{
     router.push("/")
    })

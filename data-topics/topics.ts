@@ -16,7 +16,7 @@ export const topics=[
   },
   {
     topicId: "3",
-    title: "Magazines",
+    title: "Magazine",
     subtopics:[],
   },
   {

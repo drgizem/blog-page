@@ -39,7 +39,6 @@ export default function SelectTopic({topic}:Props){
     comments:[],
     date:"",
     imageUrl:"",
-    imageName:"",
     user:{name:"",photoURL:""}})
   const [subtopicList,setSubtopicList]=useState<Subtopic[]>([])
   const {state}=useContext(UserContext)
@@ -92,7 +91,7 @@ export default function SelectTopic({topic}:Props){
         uploadFile()
     }
   ,[userImgs])
-console.log(userImgs)
+
   useEffect(()=>{
     if(topic.topicId !==""){
       const subtopicRef=doc(db,"topics",`${topic.topicId}`)
@@ -156,8 +155,9 @@ console.log(userImgs)
   }
   const handleAddSub=async(e:any)=>{
     e.preventDefault()
+    setFormSub(false)
     const newSubject={id:uuidv4(),title:subtopic.title,message:subtopic.message,comments:[],
-      imageUrl:url,imageName:userImgs.name,date:now.format("HH:mm in MM/DD/YYYY"),user:{name:state.user.name,photoURL:state.user.photoURL}}
+      imageUrl:url,date:now.format("HH:mm in MM/DD/YYYY"),user:{name:state.user.name,photoURL:state.user.photoURL}}
     setSubtopicList((pre)=>{
       return [...pre,newSubject]
     })
@@ -167,7 +167,6 @@ console.log(userImgs)
       message:"",
       comments:[],
       imageUrl:"",
-      imageName:"",
       date:"",user:{name:"",photoURL:""}
     })
     const subtopicRef=doc(db,"topics",`${topic.topicId}`)
@@ -227,7 +226,7 @@ const handleEdit=(sub:Subtopic)=>{
 const onEdit=async(e:any)=>{
   e.preventDefault()
     const editSubject={...editTopic,title:editTopic.title,message:editTopic.message,
-    date:now.format("HH:mm in MM/DD/YYYY"),imageUrl:editTopic.imageUrl,
+    date:now.format("HH:mm in MM/DD/YYYY"),imageUrl:userImgs.name ? url : editTopic.imageUrl,
       }
       console.log(editSubject)
   subtopicList[subtopicList.findIndex((item)=>item.id===editSubject.id)]=editSubject 
@@ -238,7 +237,6 @@ const onEdit=async(e:any)=>{
     message:"",
     comments:[],
     imageUrl:"",
-    imageName:"",
     date:"",user:{name:"",photoURL:""}
   }) 
   setEdit(false)
@@ -248,6 +246,22 @@ const onEdit=async(e:any)=>{
     const newList={...dbList!}
     const oldSubtopicIndex=newList.subtopics.findIndex((item:any)=>item.id===editTopic.id)
     const newSubtopic={...editSubject}
+    let newSubtopicList=[...newList.subtopics]
+    newSubtopicList[oldSubtopicIndex]=newSubtopic
+    newList.subtopics=newSubtopicList
+    setDoc(subtopicRef,newList)
+}
+const onRemove=async()=>{
+  setEditTopic((pre)=>{
+    return {...pre,imageUrl:""}
+  })
+  const subtopicRef=doc(db,"topics",`${topic.topicId}`)
+    const listRef=await getDoc(subtopicRef)
+    const dbList=listRef.data()
+    const newList={...dbList!}
+    const oldSubtopicIndex=newList.subtopics.findIndex((item:any)=>item.id===editTopic.id)
+    const oldSubtopic=newList.subtopics[oldSubtopicIndex]
+    const newSubtopic={...oldSubtopic,imageUrl:""}
     let newSubtopicList=[...newList.subtopics]
     newSubtopicList[oldSubtopicIndex]=newSubtopic
     newList.subtopics=newSubtopicList
@@ -302,7 +316,7 @@ const onEdit=async(e:any)=>{
     <p>{topic.body}</p>
     <Link href={state.user.name ==="" ? "/signin" : `/topics/${topic.topicId}`}><Button className={styles.articlebtn} onClick={()=>setFormSub(true)}>Create a new subject</Button></Link>
     {formSub && <NewSubject handleAdd={handleAddSub} onChangeImg={changeImg} handleChange={handleChangeSub} subtopic={subtopic}/>}
-    {edit && <EditSub  subtopic={editTopic} onChangeImg={changeImg} onEdit={onEdit} handleChange={handleChangeSub}/>}
+    {edit && <EditSub subtopic={editTopic} onChangeImg={changeImg} onRemoveImg={onRemove} onEdit={onEdit} handleChange={handleChangeSub}/>}
     </Row>
   {subtopicList.map((sub)=>{
     return  <Card className={styles.commentCard} key={sub.id}>
