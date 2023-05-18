@@ -1,5 +1,12 @@
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
+View demo---> [Click](https://main--classy-cannoli-cb4227.netlify.app/)
+
+## Technologies used
+- Next.js
+- Typescript
+- Sass
+
 ## Getting Started
 
 First, run the development server:
