@@ -26,6 +26,7 @@
     "react": "18.2.0",
     "react-bootstrap": "^2.7.4",
     "react-dom": "18.2.0",
+    "sass": "^1.62.1",
     "sharp": "^0.32.1",
     "swr": "^2.1.5",
     "typescript": "5.0.4",
