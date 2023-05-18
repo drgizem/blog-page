@@ -44,7 +44,7 @@ export const ProfilePage=()=>{
                 })})
         }
         image && uploadFile()
-    }
+    } // eslint-disable-next-line
   ,[image])
   const handleChangeImg = (e:any) => {
     if (e.target.files[0]) {

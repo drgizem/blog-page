@@ -20,6 +20,7 @@ import { Avatar } from "@mui/material";
 import Link from "next/link";
 import EditIcon from '@mui/icons-material/Edit';
 import { EditSub } from "@/components/EditSub";
+import Image from "next/image";
 
 type Props={
   topic:Topic
@@ -57,7 +58,7 @@ export default function SelectTopic({topic}:Props){
         setSubtopicList(list)
       })
       return ()=>unSubscribe()
-    }
+    } // eslint-disable-next-line
   },[])
   useEffect(()=>{
     const uploadFile=()=>{
@@ -89,7 +90,7 @@ export default function SelectTopic({topic}:Props){
                 }) : setUrl("")})
         }
         uploadFile()
-    }
+    } // eslint-disable-next-line
   ,[userImgs])
 
   useEffect(()=>{
@@ -102,7 +103,7 @@ export default function SelectTopic({topic}:Props){
         sub && setComments(sub.comments)
       })
       return ()=>unSubscribe()
-    }
+    } // eslint-disable-next-line
   },[subtopic])
 
   const handleChange=(e:any)=>{
@@ -228,7 +229,6 @@ const onEdit=async(e:any)=>{
     const editSubject={...editTopic,title:editTopic.title,message:editTopic.message,
     date:now.format("HH:mm in MM/DD/YYYY"),imageUrl:userImgs.name ? url : editTopic.imageUrl,
       }
-      console.log(editSubject)
   subtopicList[subtopicList.findIndex((item)=>item.id===editSubject.id)]=editSubject 
   setSubtopicList((pre)=>[...pre])
   setEditTopic({
@@ -273,7 +273,7 @@ const onRemove=async()=>{
     <NavbarModal />
     {subtopic.id !=="" ? <Row className={styles.article}>
     <h1>{subtopic.title}</h1>
-    {subtopic.imageUrl !=="" && <img src={subtopic.imageUrl} alt="" className={styles.articleimage}/>}
+    {subtopic.imageUrl !=="" && <Image src={subtopic.imageUrl} alt="" className={styles.articleimage}/>}
     <div className={styles.articleuser}>
     <Avatar className="mt-3" src={subtopic.user.photoURL}/>
     <p>{subtopic.user.name}</p>
