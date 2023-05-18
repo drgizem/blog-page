@@ -6,6 +6,7 @@ View demo---> [Click](https://main--classy-cannoli-cb4227.netlify.app/)
 - Next.js
 - Typescript
 - Sass
+- Firebase
 
 ## Getting Started
 
