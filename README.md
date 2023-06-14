@@ -6,11 +6,15 @@ View demo---> [Click](https://main--classy-cannoli-cb4227.netlify.app/)
 ![](./blog2.png)
 ![](./blog3.png)
 
-## Technologies used
+## Technologies used and Features
 - Next.js
 - Typescript
 - Sass
 - Firebase
+- Responsive web Design 
+- Image file uploads
+- Realtime comments and comments like/dislike
+- Firestore realtime CRUD and data modeling
 
 ## Getting Started
 
