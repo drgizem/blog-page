@@ -2,6 +2,10 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 View demo---> [Click](https://main--classy-cannoli-cb4227.netlify.app/)
 
+![](./blog1.png)
+![](./blog2.png)
+![](./blog3.png)
+
 ## Technologies used
 - Next.js
 - Typescript
