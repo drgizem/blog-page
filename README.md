@@ -1,6 +1,7 @@
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 View demo---> [Click](https://main--classy-cannoli-cb4227.netlify.app/)
+
 ![](./Ekran Resmi 2023-06-14 ÖS 1.22.28.png)
 ![](./Ekran Resmi 2023-06-14 ÖS 1.25.19.png)
 ![](./Ekran Resmi 2023-06-14 ÖS 1.23.37.png)
